@@ -1,0 +1,5 @@
+# All required packages to run this project.
+# Just run "pip install -r requirements.txt" to install all
+
+yfinance     # no specific version required
+

@@ -1,0 +1,33 @@
+{
+    "monitored_stocks": [
+        {"symbol": "PEAB-B.ST", "name": "peab_b"},
+        {"symbol": "SKA-B.ST", "name": "skanska_b"},
+        {"symbol": "JM.ST", "name": "jm"},
+        {"symbol": "NOTE.ST", "name": "note"},
+        {"symbol": "BUFAB.ST", "name": "bufab"},
+        {"symbol": "INVE-B.ST", "name": "investor"},
+        {"symbol": "KINV-B.ST", "name": "kinnevik"},
+        {"symbol": "VOLV-B.ST", "name": "volvo"},
+        {"symbol": "CI.ST", "name": "cellimpact"},
+        {"symbol": "ETH-USD", "name": "etherum"},
+        {"symbol": "BTC-USD", "name": "bitcoin"},
+        {"symbol": "AAPL", "name": "apple"},
+        {"symbol": "AMZN", "name": "amazon"},
+        {"symbol": "PREV-B.ST", "name": "prevas"},
+        {"symbol": "BOL.ST", "name": "boliden"},
+        {"symbol": "SEB-A.ST", "name": "seb"},
+        {"symbol": "SWED-A.ST", "name": "swedbank"},
+        {"symbol": "NDA-SE.ST", "name": "nordea"},
+        {"symbol": "OMX", "name": "omxspi"},
+        {"symbol": "MAERSK-B.CO", "name": "maersk"},
+        {"symbol": "TSLA", "name": "tesla"},
+        {"symbol": "META", "name": "meta"},
+        {"symbol": "ACCON.ST", "name": "Acconeer"},
+        {"symbol": "AUSS.OL", "name": "Austevoll Seafood"},
+        {"symbol": "BURE.ST", "name": "Bure Equity"},
+        {"symbol": "NVDA", "name": "nvidia"},
+        {"symbol": "XBRANE.ST", "name": "xbrane"},
+        {"symbol": "LMT", "name": "lockhead martin"},
+        {"symbol": "ENRO.ST", "name": "Eniro Group"}
+    ]
+}
