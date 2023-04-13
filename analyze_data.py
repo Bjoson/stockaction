@@ -1,5 +1,5 @@
 """
-analayse_data.py
+analayze_data.py
 
 This script analyses the stock data and creates buy/sell recommendations in
 the form of image graphs.
@@ -11,8 +11,10 @@ from datetime import datetime
 import os
 from configuration import Configuration
 import yfinance as yf
+import pandas as pd
+from simple_moving_average_strategy import simple_moving_average_strategy as sma
 
-class StockAnalyser:
+class StockAnalyzer:
 
     def __init__(self):
         """Constructor
@@ -24,7 +26,16 @@ class StockAnalyser:
             os.makedirs(self.data_path)
 
 
-    def download_all_data(self, data_path):
+    def get_csv_path(self, stock):
+        """Get the csv data path for the given stock
+
+        Args:
+            stock (dictionary): the stock to get the data path for
+        """
+        return f"{self.data_path}/{stock['name']}.csv"
+
+
+    def download_all_data(self):
         """Download the stock data for all monitored stocks
 
         Args:
@@ -34,7 +45,8 @@ class StockAnalyser:
         for stock in self.configuration.get_monitored_stocks():
             stock_data = yf.download(stock["symbol"] ,period="max", proxy=proxy)
             temp_data = stock_data.copy(deep=True)
-            temp_data.to_csv(f"{data_path}{stock['name']}.csv")
+            temp_data.to_csv(self.get_csv_path(stock))
+
 
     def create_output_folder(self):
         """Create an output folder where to place the generated graphs
@@ -50,11 +62,25 @@ class StockAnalyser:
         self.create_output_folder()
         for stock in self.configuration.get_monitored_stocks():
             print(f"Analyzing {stock['name']}")
+            history_values = pd.read_csv(self.get_csv_path(stock))
+            history_values = history_values[-self.configuration.get_num_days_to_analyze():]
+            history_values.reset_index(inplace=True)
+            history_values.set_index('Date', inplace=True)
+            a = sma()
+            a.evaluate_strategy(25, 200, history_values, 1000)
+            a.plot(history_values)
+            break
 
 
+    def find_best_strategy(self, history_values):
+        """Try all known strategies, keep the one returning the most
 
+        Args:
+            history_values (panda stock data): the values to analyze
+        """
 
 
 if __name__ == "__main__":
-    sa = StockAnalyser()
+    sa = StockAnalyzer()
+    #sa.download_all_data()
     sa.analyze_all()

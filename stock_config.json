@@ -1,5 +1,5 @@
 {
-    "monitored_stocks" = [
+    "monitored_stocks" : [
         {"symbol": "PEAB-B.ST", "name": "Peab B"},
         {"symbol": "SKA-B.ST", "name": "Skanska B"},
         {"symbol": "JM.ST", "name": "Jm"},
@@ -28,7 +28,10 @@
         {"symbol": "NVDA", "name": "Nvidia"},
         {"symbol": "XBRANE.ST", "name": "Xbrane"},
         {"symbol": "LMT", "name": "Lockhead Martin"},
-        {"symbol": "ENRO.ST", "name": "Eniro Group"},
+        {"symbol": "ENRO.ST", "name": "Eniro Group"}
     ],
-    "proxy":"http://proxy1.corp.saab.se:8080"
+    "proxy":"http://proxy1.corp.saab.se:8080",
+    "prior_days_to_analyze":2600,
+    "days_to_plot":500,
+    "transaction_cost":0.005
 }
