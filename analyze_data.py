@@ -65,10 +65,11 @@ class StockAnalyzer:
             history_values = pd.read_csv(self.get_csv_path(stock))
             history_values = history_values[-self.configuration.get_num_days_to_analyze():]
             history_values.reset_index(inplace=True)
-            history_values.set_index('Date', inplace=True)
+            history_values.set_index('Date')
             a = sma()
             a.evaluate_strategy(25, 200, history_values, 1000)
-            a.plot(history_values)
+            plot_values = history_values.tail(self.configuration.get_num_days_to_plot()).copy()
+            a.plot(plot_values)
             break
 
 
@@ -78,6 +79,7 @@ class StockAnalyzer:
         Args:
             history_values (panda stock data): the values to analyze
         """
+        pass
 
 
 if __name__ == "__main__":

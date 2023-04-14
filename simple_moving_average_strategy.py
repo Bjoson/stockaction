@@ -10,10 +10,10 @@ Date: 2023-04-12
 
 import configuration
 import numpy as np
-#import matplotlib
-#matplotlib.use('agg')
 import matplotlib.pyplot as plt
-from pandas.plotting import scatter_matrix
+import matplotlib.dates as mdates
+import matplotlib.ticker as ticker
+import pandas as pd
 
 class simple_moving_average_strategy:
 
@@ -47,8 +47,9 @@ class simple_moving_average_strategy:
         Args:
             sv (_type_): the values to use for the evaluation
         """
+        sv.index = pd.to_datetime(sv['Date'])
         plt.figure(figsize=(12, 6))
-        plt.plot(sv['Close'], label='Close', alpha=0.5)
+        plt.plot(sv.index, sv['Close'], label='Close', alpha=0.5)
         plt.plot(sv['short_sma'], label="short_sma", linestyle='--', alpha=0.7)
         plt.plot(sv['long_sma'], label='long_sma', linestyle='--', alpha=0.7)
 
@@ -62,7 +63,17 @@ class simple_moving_average_strategy:
         plt.ylabel('Close Price')
         plt.title(f'- Price with Buy and Sell Signals')
         plt.legend(loc='best')
+
+        # Not too many x-axis labels
+        sv.index = pd.to_datetime(sv['Date'])
+        #sv.drop('Date', axis=1, inplace=True)
+        ax = plt.gca()
+        ax.xaxis.set_major_locator(ticker.MultipleLocator(base=50))  # Ändra 'base' för att justera avståndet mellan tick-labels
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        plt.setp(ax.get_xticklabels(), rotation=45, ha='right')
+
         plt.grid()
+        plt.tight_layout()
         plt.show()
 
 
