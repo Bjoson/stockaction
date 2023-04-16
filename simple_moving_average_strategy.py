@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 import pandas as pd
+import utilities
 
 class simple_moving_average_strategy:
 
@@ -22,13 +23,12 @@ class simple_moving_average_strategy:
         """
         pass
 
-    def evaluate_strategy(self, short_sma, long_sma, sv, start_cash):
-        """Calculate the return when using this strategy
+    def set_signal_points(self, short_sma, long_sma, sv):
+        """Set the buy/sell signal points for the current parameters
         Args:
             short_sma (_type_): the short SMA timeframe, e.g. 25 days
             long_sma (_type_): the long SMA timeframe, e.g. 200 days
             sv (_type_): the values to use for the evaluation
-            start_cash (_type_): how much cash to start with
         Return:
             the final cash using the given parameters
         """
@@ -42,7 +42,7 @@ class simple_moving_average_strategy:
 
 
     def plot(self, sv):
-        """Plot the current data, including se
+        """Plot the current data, including sell and buy points
 
         Args:
             sv (_type_): the values to use for the evaluation
@@ -77,40 +77,65 @@ class simple_moving_average_strategy:
         plt.show()
 
 
+    def calculate_return(self, sv, initial_capital):
+        """Given history values including signal values, calculate the return
+
+        Args:
+            sv (_type_): the history values to use for the evaluation
+            start_cash (_type_): how much cash to start with
+        """
+        cash = initial_capital
+        position = 0.0
+
+        for index, row in sv.iterrows():
+            signal = row['signal']
+            stock_price = row['Close']
+
+            if 1 == signal:  # buy
+                if cash <= 0:
+                    print("ERROR: buy signal but out of cash")
+                    return 0
+                position, used_cash = utilities.buy_max_shares(cash, stock_price)
+                cash -= used_cash
+            elif signal == -1 and position > 0: #sell
+                cash += position * stock_price
+                position = 0
+
+        # undo the last buy if currently has a position
+        # since strategy is based on only selling at sell-points
+        if position > 0:
+            cash += used_cash
+
+        return cash
 
 
-# ## Agera
-# import numpy as np
-# import pandas as pd
+    def find_best_parameters(self, sv, initial_capital):
+        """Given history values, evaluate the best parameters for this strategy
 
-# # ... (Samma kod som tidigare för att beräkna SMA och hitta köp- och säljsignaler)
+        Args:
+            sv (_type_): the history values to use for the evaluation
+            initial_capital (_type_): initial capital to use for the simulation
+        """
+        best_params = None
+        best_return = None
+        short_values = range(3, 50, 1)
+        long_values = range(25, 200, 5)
 
-# initial_capital = 1000.0
-# capital = initial_capital
-# shares = 0
+        #short_values = range(3, 50, 5)
+        #long_values = range(25, 100, 10)
 
-# # Iterera över DataFrame och agera på köp- och säljsignaler
-# for index, row in df.iterrows():
-#     if row['Cross'] == 2:  # Köpsignal
-#         shares_to_buy = capital // row['Close']
-#         if shares_to_buy > 0:
-#             cost = shares_to_buy * row['Close']
-#             shares += shares_to_buy
-#             capital -= cost
-#     elif row['Cross'] == -2:  # Säljsignal
-#         if shares > 0:
-#             revenue = shares * row['Close']
-#             capital += revenue
-#             shares = 0
+        for long_sma in long_values:
+            for short_sma in short_values:
+                if short_sma >= long_sma:
+                    continue
 
-# # Sälj alla aktier vid sista säljpositionen
-# if shares > 0:
-#     last_sell_position = df.loc[df['Cross'] == -2].index[-1]
-#     last_sell_price = df.loc[last_sell_position, 'Close']
-#     capital += shares * last_sell_price
-#     shares = 0
+                self.set_signal_points(short_sma, long_sma, sv)
+                profit = self.calculate_return(sv, initial_capital)
 
-# total_assets = capital
-# print(f"Initialkapital: {initial_capital:.2f} kr")
-# print(f"Totala tillgångar: {total_assets:.2f} kr")
+                if best_return is None or profit > best_return:
+                    best_params = (short_sma, long_sma)
+                    best_return = profit
+                    print(f"Current best profit {best_return} at {best_params}")
 
+        print(f"Best profit {best_return} at {best_params}")
+        self.set_signal_points( best_params[0], best_params[1], sv)

@@ -66,7 +66,11 @@ class Configuration:
         Return
             the cost for this transaction
         """
-        return transaction_amount * Configuration.config_json["transaction_cost"]
+        if 0 == transaction_amount:
+            return 0
+        percentage_cost = transaction_amount * Configuration.config_json["transaction_percent_cost"]
+        minimum_fixed_cost = Configuration.config_json["transaction_min_cost"]
+        return max(percentage_cost, minimum_fixed_cost)
 
 
 if __name__ == "__main__":
