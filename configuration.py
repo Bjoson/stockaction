@@ -58,6 +58,12 @@ class Configuration:
         return Configuration.config_json["days_to_plot"]
 
 
+    def get_initial_cash_for_simulation(self):
+        """Get the initial cash to use for the validation of the sell/buy points
+        """
+        return Configuration.config_json["initial_cash_for_simulation"]
+
+
     def get_transaction_cost(self, transaction_amount):
         """Given a transaction amount, calculate the transaction cost
 

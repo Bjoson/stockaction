@@ -32,7 +32,8 @@
     ],
     "proxy":"http://proxy1.corp.saab.se:8080",
     "prior_days_to_analyze":2600,
-    "days_to_plot":1000,
-    "transaction_percent_cost":0.005,
-    "transaction_min_cost":39
+    "days_to_plot":400,
+    "transaction_percent_cost":0.0015,
+    "transaction_min_cost":100,
+    "initial_cash_for_simulation":100000
 }

@@ -15,13 +15,16 @@ import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 import pandas as pd
 import utilities
+from collections import namedtuple
+import bisect
 
 class simple_moving_average_strategy:
 
     def __init__(self):
         """Constructor
         """
-        pass
+        self.best_sma = None
+        self.best_lma = None
 
     def set_signal_points(self, short_sma, long_sma, sv):
         """Set the buy/sell signal points for the current parameters
@@ -50,8 +53,8 @@ class simple_moving_average_strategy:
         sv.index = pd.to_datetime(sv['Date'])
         plt.figure(figsize=(12, 6))
         plt.plot(sv.index, sv['Close'], label='Close', alpha=0.5)
-        plt.plot(sv['short_sma'], label="short_sma", linestyle='--', alpha=0.7)
-        plt.plot(sv['long_sma'], label='long_sma', linestyle='--', alpha=0.7)
+        plt.plot(sv['short_sma'], label=f"short_sma {self.best_sma}", linestyle='--', alpha=0.7)
+        plt.plot(sv['long_sma'], label=f'long_sma {self.best_lma}', linestyle='--', alpha=0.7)
 
         buy_signals = sv[sv['signal'] == 1]
         sell_signals = sv[sv['signal'] == -1]
@@ -116,19 +119,18 @@ class simple_moving_average_strategy:
             sv (_type_): the history values to use for the evaluation
             initial_capital (_type_): initial capital to use for the simulation
         """
+        ParamTuple = namedtuple('ParamTuple', ['return_amount', 'quick', 'long'])
+        top_tuples = []
+
         best_params = None
         best_return = None
-        short_values = range(3, 50, 1)
-        long_values = range(25, 200, 5)
 
-        #short_values = range(3, 50, 5)
-        #long_values = range(25, 100, 10)
+        #sort the best 10 tuples, if an 'almost as good version exists but with
+        #better distance between short and long, use that one instead?!
 
-        for long_sma in long_values:
-            for short_sma in short_values:
-                if short_sma >= long_sma:
-                    continue
-
+        #for long_sma in range(10, 200, 5):
+        for long_sma in range(10, 80, 5):
+            for short_sma in range(3, min(long_sma-5,50), 1):
                 self.set_signal_points(short_sma, long_sma, sv)
                 profit = self.calculate_return(sv, initial_capital)
 
@@ -136,6 +138,12 @@ class simple_moving_average_strategy:
                     best_params = (short_sma, long_sma)
                     best_return = profit
                     print(f"Current best profit {best_return} at {best_params}")
+                current_tuple = ParamTuple(profit, short_sma, long_sma)
+                bisect.insort(top_tuples, current_tuple, key=lambda c:c[0])
+                top_tuples = top_tuples[-10:]  #top 10
 
+        self.best_sma = best_params[0]
+        self.best_lma = best_params[1]
         print(f"Best profit {best_return} at {best_params}")
         self.set_signal_points( best_params[0], best_params[1], sv)
+        print(f"best tuples {top_tuples}")
