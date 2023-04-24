@@ -13,6 +13,7 @@ from configuration import Configuration
 import yfinance as yf
 import pandas as pd
 from simple_moving_average_strategy import simple_moving_average_strategy as sma
+from exponential_moving_average_strategy import exponential_moving_average_strategy as ema
 
 class StockAnalyzer:
 
@@ -67,9 +68,17 @@ class StockAnalyzer:
             history_values.reset_index(inplace=True)
             history_values.set_index('Date')
             a = sma()
-            a.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
+            sma_return, sma_params = a.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
+            b = ema()
+            ema_return, ema_params = b.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
+
             plot_values = history_values.tail(self.configuration.get_num_days_to_plot()).copy()
-            a.plot(plot_values)
+            if sma_return > ema_return:
+                a.set_params(plot_values, sma_params)
+                a.plot(plot_values, stock['name'])
+            else:
+                b.set_params(plot_values, sma_params)
+                b.plot(plot_values, stock['name'])
             break
 
 

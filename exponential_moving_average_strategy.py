@@ -1,11 +1,11 @@
 """
-moving_average_strategy.py
+exponential_moving_average_strategy.py
 
-Using rolling or exponential mean, to calculate buy and
-sell points and calculating a total return using the method.
+Using exponential moving average (EMA) to calculate buy and
+sell points and calculating a total return using this method.
 
 Author: Björn Johansson
-Date: 2023-04-12
+Date: 2023-04-24
 """
 
 import configuration
@@ -18,13 +18,13 @@ import utilities
 from collections import namedtuple
 import bisect
 
-class simple_moving_average_strategy:
+class exponential_moving_average_strategy:
 
     def __init__(self):
         """Constructor
         """
-        self.best_sma = None
-        self.best_lma = None
+        self.best_short_ema = None
+        self.best_long_ema = None
 
 
     def set_params(self, sv, params_to_set):
@@ -36,22 +36,23 @@ class simple_moving_average_strategy:
         self.set_signal_points( params_to_set[0], params_to_set[1], sv)
 
 
-    def set_signal_points(self, short_sma, long_sma, sv):
+    def set_signal_points(self, short_ema, long_ema, sv):
         """Set the buy/sell signal points for the current parameters
         Args:
-            short_sma (_type_): the short SMA timeframe, e.g. 25 days
-            long_sma (_type_): the long SMA timeframe, e.g. 200 days
+            short_ema (_type_): the short EMA timeframe, e.g. 25 days
+            long_ema (_type_): the long EMA timeframe, e.g. 200 days
             sv (_type_): the values to use for the evaluation
         Return:
             the final cash using the given parameters
         """
-        sv['short_sma'] = sv['Close'].rolling(window=short_sma).mean()
-        sv['long_sma'] = sv['Close'].rolling(window=long_sma).mean()
+        sv['short_ema'] = sv['Close'].ewm(span=short_ema, adjust=False).mean()
+        sv['long_ema'] = sv['Close'].ewm(span=long_ema, adjust=False).mean()
 
         sv['signal'] = 0
 
-        sv.iloc[short_sma:, sv.columns.get_loc('signal')] = np.where(sv['short_sma'][short_sma:] > sv['long_sma'][short_sma:], 1, -1)
+        sv.iloc[short_ema:, sv.columns.get_loc('signal')] = np.where(sv['short_ema'][short_ema:] > sv['long_ema'][short_ema:], 1, -1)
         sv['signal'] = sv['signal'].where(sv['signal'].shift(1) != sv['signal'])
+
 
 
     def plot(self, sv, stock_name):
@@ -61,9 +62,9 @@ class simple_moving_average_strategy:
             sv (_type_): the values to use for the evaluation
             stock_name (string) : the name of the stock
         """
-        utilities.plot_sell_buy_ma(sv, 'short_sma', 'long_sma',
-                                   f"Short SMA {self.best_sma}",
-                                   f"Long SMA {self.best_lma}",
+        utilities.plot_sell_buy_ma(sv, 'short_ema', 'long_ema',
+                                   f"Short EMA {self.best_short_ema}",
+                                   f"Long EMA {self.best_long_ema}",
                                    stock_name)
 
 
@@ -84,22 +85,26 @@ class simple_moving_average_strategy:
         #better distance between short and long, use that one instead?!
 
         #for long_sma in range(10, 200, 5):
-        for long_sma in range(10, 80, 5):
-            for short_sma in range(3, min(long_sma-5,50), 1):
-                self.set_signal_points(short_sma, long_sma, sv)
+        for long_ema in range(10, 80, 5):
+            for short_ema in range(3, min(long_ema-5,50)+1, 1):
+                self.set_signal_points(short_ema, long_ema, sv)
                 profit = utilities.calculate_return(sv, initial_capital)
 
                 if best_return is None or profit > best_return:
-                    best_params = (short_sma, long_sma)
+                    best_params = (short_ema, long_ema)
                     best_return = profit
-                    print(f"SMA Current best profit {best_return} at {best_params}")
-                current_tuple = ParamTuple(profit, short_sma, long_sma)
+                    print(f"EMA Current best profit {best_return} at {best_params}")
+                current_tuple = ParamTuple(profit, short_ema, long_ema)
                 bisect.insort(top_tuples, current_tuple, key=lambda c:c[0])
                 top_tuples = top_tuples[-10:]  #top 10
 
-        self.best_sma = best_params[0]
-        self.best_lma = best_params[1]
-        print(f"SMA Best profit {best_return} at {best_params}")
+        self.best_short_ema = best_params[0]
+        self.best_long_ema = best_params[1]
+
+        self.best_short_ema = 5
+        self.best_long_ema = 15
+
+        print(f"EMA Best profit {best_return} at {best_params}")
         self.set_signal_points( best_params[0], best_params[1], sv)
-        print(f"SMA best tuples {top_tuples}")
+        print(f"EMA best tuples {top_tuples}")
         return best_return, best_params
