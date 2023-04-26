@@ -39,9 +39,9 @@ class exponential_moving_average_strategy:
     def set_signal_points(self, short_ema, long_ema, sv):
         """Set the buy/sell signal points for the current parameters
         Args:
-            short_ema (_type_): the short EMA timeframe, e.g. 25 days
-            long_ema (_type_): the long EMA timeframe, e.g. 200 days
-            sv (_type_): the values to use for the evaluation
+            short_ema (int): the short EMA timeframe, e.g. 25 days
+            long_ema (int): the long EMA timeframe, e.g. 200 days
+            sv (pandas): the values to use for the evaluation
         Return:
             the final cash using the given parameters
         """
@@ -54,12 +54,11 @@ class exponential_moving_average_strategy:
         sv['signal'] = sv['signal'].where(sv['signal'].shift(1) != sv['signal'])
 
 
-
     def plot(self, sv, stock_name):
         """Plot the current data, including sell and buy points
 
         Args:
-            sv (_type_): the values to use for the evaluation
+            sv (pandas): the values to use for the evaluation
             stock_name (string) : the name of the stock
         """
         utilities.plot_sell_buy_ma(sv, 'short_ema', 'long_ema',
@@ -72,8 +71,8 @@ class exponential_moving_average_strategy:
         """Given history values, evaluate the best parameters for this strategy
 
         Args:
-            sv (_type_): the history values to use for the evaluation
-            initial_capital (_type_): initial capital to use for the simulation
+            sv (panda): the history values to use for the evaluation
+            initial_capital (int): initial capital to use for the simulation
         """
         ParamTuple = namedtuple('ParamTuple', ['return_amount', 'quick', 'long'])
         top_tuples = []
@@ -100,10 +99,6 @@ class exponential_moving_average_strategy:
 
         self.best_short_ema = best_params[0]
         self.best_long_ema = best_params[1]
-
-        self.best_short_ema = 5
-        self.best_long_ema = 15
-
         print(f"EMA Best profit {best_return} at {best_params}")
         self.set_signal_points( best_params[0], best_params[1], sv)
         print(f"EMA best tuples {top_tuples}")

@@ -14,7 +14,7 @@ import yfinance as yf
 import pandas as pd
 from simple_moving_average_strategy import simple_moving_average_strategy as sma
 from exponential_moving_average_strategy import exponential_moving_average_strategy as ema
-
+from buy_and_hold_strategy import buy_and_hold_strategy as bhs
 class StockAnalyzer:
 
     def __init__(self):
@@ -67,18 +67,24 @@ class StockAnalyzer:
             history_values = history_values[-self.configuration.get_num_days_to_analyze():]
             history_values.reset_index(inplace=True)
             history_values.set_index('Date')
+            c = bhs()
+            bh_return = c.evaluate_strategy(history_values, self.configuration.get_initial_cash_for_simulation())
             a = sma()
             sma_return, sma_params = a.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
             b = ema()
             ema_return, ema_params = b.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
 
             plot_values = history_values.tail(self.configuration.get_num_days_to_plot()).copy()
-            if sma_return > ema_return:
-                a.set_params(plot_values, sma_params)
-                a.plot(plot_values, stock['name'])
+            max_active = max(sma_return, ema_return)
+            if bh_return > max_active:
+                c.plot(history_values, stock['name'])
             else:
-                b.set_params(plot_values, sma_params)
-                b.plot(plot_values, stock['name'])
+                if sma_return > ema_return:
+                    a.set_params(plot_values, sma_params)
+                    a.plot(plot_values, stock['name'])
+                else:
+                    b.set_params(plot_values, ema_params)
+                    b.plot(plot_values, stock['name'])
             break
 
 

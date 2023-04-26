@@ -1,8 +1,8 @@
 {
     "monitored_stocks" : [
+        {"symbol": "BOL.ST", "name": "Boliden"},
         {"symbol": "INVE-B.ST", "name": "Investor"},
         {"symbol": "MAERSK-B.CO", "name": "Maersk"},
-        {"symbol": "BOL.ST", "name": "Boliden"},
         {"symbol": "PEAB-B.ST", "name": "Peab B"},
         {"symbol": "SKA-B.ST", "name": "Skanska B"},
         {"symbol": "JM.ST", "name": "Jm"},
@@ -31,8 +31,8 @@
         {"symbol": "ENRO.ST", "name": "Eniro Group"}
     ],
     "proxy":"http://proxy1.corp.saab.se:8080",
-    "prior_days_to_analyze":1000,
-    "days_to_plot":1000,
+    "prior_days_to_analyze":1200,
+    "days_to_plot":1200,
     "transaction_percent_cost":0.0015,
     "transaction_min_cost":100,
     "initial_cash_for_simulation":100000
