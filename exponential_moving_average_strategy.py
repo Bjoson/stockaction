@@ -64,7 +64,7 @@ class exponential_moving_average_strategy:
         utilities.plot_sell_buy_ma(sv, 'short_ema', 'long_ema',
                                    f"Short EMA {self.best_short_ema}",
                                    f"Long EMA {self.best_long_ema}",
-                                   stock_name)
+                                   f"{stock_name} - exponential moving average active trading")
 
 
     def find_best_parameters(self, sv, initial_capital):

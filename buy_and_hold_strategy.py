@@ -43,6 +43,6 @@ class buy_and_hold_strategy:
         """
         sv['signal'] = 0
         utilities.plot_sell_buy_ma(sv, None, None,
-                                   f"Buy and hold",
                                    "",
-                                   stock_name)
+                                   "",
+                                   f"{stock_name} - Buy and hold strategy")

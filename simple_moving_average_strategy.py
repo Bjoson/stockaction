@@ -64,7 +64,7 @@ class simple_moving_average_strategy:
         utilities.plot_sell_buy_ma(sv, 'short_sma', 'long_sma',
                                    f"Short SMA {self.best_sma}",
                                    f"Long SMA {self.best_lma}",
-                                   stock_name)
+                                   f"{stock_name} - simple moving average active trading")
 
 
     def find_best_parameters(self, sv, initial_capital):
@@ -84,7 +84,8 @@ class simple_moving_average_strategy:
         #better distance between short and long, use that one instead?!
 
         #for long_sma in range(10, 200, 5):
-        for long_sma in range(10, 80, 5):
+        #for long_sma in range(10, 80, 5):
+        for long_sma in range(10, 20, 5):
             for short_sma in range(3, min(long_sma-5,50), 1):
                 self.set_signal_points(short_sma, long_sma, sv)
                 profit = utilities.calculate_return(sv, initial_capital)
@@ -103,3 +104,14 @@ class simple_moving_average_strategy:
         self.set_signal_points( best_params[0], best_params[1], sv)
         print(f"SMA best tuples {top_tuples}")
         return best_return, best_params
+
+
+    def store_current_params(self, json_file_path):
+        """store the current parameters in
+        """
+        sma_params = {}
+        sma_params["short_moving_average"] = self.best_sma
+        sma_params["long_moving_average"] = self.best_lma
+        params = {}
+        params["SMA_Parameters"] = sma_params
+        utilities.update_json_file_data(json_file_path, params)

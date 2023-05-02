@@ -15,6 +15,8 @@ import pandas as pd
 from simple_moving_average_strategy import simple_moving_average_strategy as sma
 from exponential_moving_average_strategy import exponential_moving_average_strategy as ema
 from buy_and_hold_strategy import buy_and_hold_strategy as bhs
+
+
 class StockAnalyzer:
 
     def __init__(self):
@@ -71,8 +73,11 @@ class StockAnalyzer:
             bh_return = c.evaluate_strategy(history_values, self.configuration.get_initial_cash_for_simulation())
             a = sma()
             sma_return, sma_params = a.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
+            a.store_current_params(f"./saved_stock_parameters/{stock['name']}.json")
             b = ema()
-            ema_return, ema_params = b.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
+            #ema_return, ema_params = b.find_best_parameters(history_values, self.configuration.get_initial_cash_for_simulation())
+            ema_return = 0
+            ema_params = None
 
             plot_values = history_values.tail(self.configuration.get_num_days_to_plot()).copy()
             max_active = max(sma_return, ema_return)

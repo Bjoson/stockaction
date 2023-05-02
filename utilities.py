@@ -12,7 +12,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
-
+import json
 
 def buy_max_shares(cash, stock_price):
     """Given cash and a stock_price, calculate the maximum number of
@@ -50,7 +50,7 @@ def sell_shares(stock_price, num_stocks):
     return sell_amount - transaction_cost
 
 
-def plot_sell_buy_ma(sv, short_name, long_name, short_label, long_label, stock_name):
+def plot_sell_buy_ma(sv, short_name, long_name, short_label, long_label, header):
     """Plot the current data, including sell and buy points
 
     Args:
@@ -76,7 +76,7 @@ def plot_sell_buy_ma(sv, short_name, long_name, short_label, long_label, stock_n
 
     plt.xlabel('Date')
     plt.ylabel('Close Price')
-    plt.title(f'{stock_name} - Price with Buy and Sell Signals')
+    plt.title(f'{header}')
     plt.legend(loc='best')
 
     # Not too many x-axis labels
@@ -151,6 +151,25 @@ def calculate_midpoint_day_price(sv, target_date):
     return midpoint.iloc[0]
 
 
+def update_json_file_data(json_file_path, new_data):
+    """Write new data to a json file
+
+    Args:
+        json_file_path (string): path to the json file to create or update
+        new_data (dict): the new data to write or update in the file
+    """
+    try:
+        with open(json_file_path, "r") as json_file:
+            data = json.load(json_file)
+    except FileNotFoundError:
+        data = {}
+
+    # Update the data with new_data
+    data.update(new_data)
+
+    # Write the updated data back to the JSON file
+    with open(json_file_path, "w") as json_file:
+        json.dump(data, json_file, indent=4)
 
 
 if __name__ == "__main__":
