@@ -172,9 +172,38 @@ def update_json_file_data(json_file_path, new_data):
         json.dump(data, json_file, indent=4)
 
 
+def get_params_from_json_file(json_file_path, dict_name):
+    """retrieve a set of parameters from a json file
+
+    Args:
+        json_file_path (string): path to the json file
+        dict_name (string): the name of the dict to search for
+    Return:
+        The dict of values if found, None if not
+    """
+    try:
+        with open(json_file_path, "r") as json_file:
+            data = json.load(json_file)
+    except FileNotFoundError:
+        return None
+    try:
+        return data[dict_name]
+    except:
+        return None
+
+
 if __name__ == "__main__":
     #print(buy_max_shares(50, 50))
 
-    history_values = pd.read_csv(f"./stock_data/apple.csv")
-    date = "1981-01-06"
-    print(calculate_midpoint_day_price(history_values, date))
+    # history_values = pd.read_csv(f"./stock_data/apple.csv")
+    # date = "1981-01-06"
+    # print(calculate_midpoint_day_price(history_values, date))
+
+    test_dict = {}
+    s = {}
+    s['a'] = 'b'
+    s['c'] = 'd'
+    test_dict["K"] = s
+    update_json_file_data("test.json", test_dict)
+    c = get_params_from_json_file("test.json", "K")
+    print(c)

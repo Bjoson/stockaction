@@ -107,7 +107,9 @@ class simple_moving_average_strategy:
 
 
     def store_current_params(self, json_file_path):
-        """store the current parameters in
+        """store the current parameters in the given json file path
+        Args:
+            json_file_path (string) : path to where to store the data
         """
         sma_params = {}
         sma_params["short_moving_average"] = self.best_sma
@@ -115,3 +117,22 @@ class simple_moving_average_strategy:
         params = {}
         params["SMA_Parameters"] = sma_params
         utilities.update_json_file_data(json_file_path, params)
+
+
+    def restore_params(self, json_file_path):
+        """Restore parameters from the supplied json file path
+
+        Args:
+            json_file_path (string): the filepath to the json file
+        Return:
+            True if successful
+        """
+        try:
+            sma_params = utilities.get_params_from_json_file(json_file_path, "SMA_Parameters")
+            self.best_sma = sma_params["short_moving_average"]
+            self.best_lma = sma_params["long_moving_average"]
+            return True
+        except:
+            return False
+
+
